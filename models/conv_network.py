@@ -44,7 +44,7 @@ class DeconvBlock(nn.Module):
 
     def forward(self, inputs):
         x = torch.cat(inputs, dim=1) if isinstance(inputs, list) else inputs
-        x = F.interpolate(x, scale_factor=2, mode='nearest', recompute_scale_factor=True)
+        x = F.interpolate(x, scale_factor=2, mode='nearest')
         x = F.relu(self.conv_0(x))
         return x
 
