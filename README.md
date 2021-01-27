@@ -20,14 +20,15 @@ Download 34 sample scenes (from the CARLA dataset) for demo purpose [link](https
 
 ###### Run the demo code
 ```
-CUDA_VSIBLE_DEVICES=0 python3 demo.py \
-    --mode=demo \
-    --batch_size=1 \
+CUDA_VSIBLE_DEVICES=0 python demo.py \
     --dataset=carla \
+    --mode=demo \
     --movement_type=circle \
     --data_path=./datasets/carla_samples \
     --output_path=./output/carla_samples \
-    --style_path=./data/sample_styles/road_2.jpg \
+    --pre_trained_model=./pre_trained_models/carla/gvsnet_model.pt \
+    --style_path=./data/sample_styles/carla_1.png \
+
 ```
 ###### Controlling style of the generated views
 A style image can be pased with the following flag ``` --style_path ```. If not given the color image of input view is used as a style image.

@@ -18,6 +18,8 @@ arg_parser.add_argument('--movement_type', default='circle', choices=['circle', 
                         help='camera movement type: ')
 arg_parser.add_argument('--output_path', type=str, default=f'./output/{get_current_time()}', 
                         help='path for saving results')
+arg_parser.add_argument('--pre_trained_model', type=str, default=f'./pre_trained_models/carla/gvsnet_model.pt',
+                        help='path for pre_trained_model')
 # arg_parser.add_argument('--output_path', type=str, default=f'./output/{get_current_time()}', 
 #                         help='path for saving results')
 
@@ -29,8 +31,7 @@ device = f'cuda:{opts.gpu_id}' if opts.gpu_id>-1 else 'cpu'
 os.makedirs(opts.output_path, exist_ok=True)
 
 gvs_net = GVSNet(opts)
-fullgvs_state = f'./pre_trained_models/{opts.dataset}/gvsnet_model.pt'
-gvs_net.load_state_dict(torch.load(fullgvs_state), strict=True)
+gvs_net.load_state_dict(torch.load(opts.pre_trained_model), strict=True)
 gvs_net.to(device)
 gvs_net.eval()
 
