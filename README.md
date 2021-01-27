@@ -31,3 +31,6 @@ CUDA_VSIBLE_DEVICES=0 python3 demo.py \
 ```
 ###### Controlling style of the generated views
 A style image can be pased with the following flag ``` --style_path ```. If not given the color image of input view is used as a style image.
+
+
+Copy Right: This repo builds upon the [SPADE](https://github.com/NVlabs/SPADE) repository from NVIDIA
