@@ -7,7 +7,7 @@ In NeurIPS 2020
 This code was develped with ```python3.6```
 ```
 scikit-image
-torch # tested with versions 1.7.1, but it should work with older versions as well
+torch # tested with versions 1.7.1, but it might work with older versions as well
 tqdm
 ```
 #### Instructions

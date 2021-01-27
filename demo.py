@@ -13,7 +13,7 @@ from data import CarlaMiniLoader
 from utils import SaveResults
 from utils import get_current_time
 from utils import get_cam_poses
-
+from utils import convert_model
 arg_parser.add_argument('--movement_type', default='circle', choices=['circle', 'horizontal', 'forward'], 
                         help='camera movement type: ')
 arg_parser.add_argument('--output_path', type=str, default=f'./output/{get_current_time()}', 
@@ -35,6 +35,8 @@ gvs_net.load_state_dict(torch.load(opts.pre_trained_model), strict=True)
 gvs_net.to(device)
 gvs_net.eval()
 
+if device=='cpu':
+    gvs_net = convert_model(gvs_net)
 dataset = DataLoader(LoadSamples(opts), batch_size=1, shuffle=False)
 
 saver_results = SaveResults(opts.output_path, opts.dataset)

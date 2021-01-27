@@ -5,4 +5,6 @@ CUDA_VSIBLE_DEVICES=0 python demo.py \
     --data_path=./datasets/carla_samples \
     --output_path=./output/carla_samples_style_1 \
     --pre_trained_model=./pre_trained_models/carla/gvsnet_model.pt \
-    --style_path=./data/sample_styles/carla_2.png \
+    --style_path=./data/sample_styles/carla_1.png \
+    # --gpu_id=-1 \
+

@@ -1,8 +1,7 @@
 import time
 from .save_results import SaveResults
 from .camera_movements import get_cam_poses
-
-# from .save_semantics import SaveSemantics
+from .convert_model import convert_model
 
 def get_current_time():
     time_struct = time.gmtime()
