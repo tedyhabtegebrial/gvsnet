@@ -4,8 +4,9 @@ Generative View Synthesis: From Single-view Semantics to Novel-view Images.<br>
 In NeurIPS 2020
 
 #### Dependencies
+This code was develped with ```python3.6```
 ```
-python3.6
+scikit-image
 torch # tested with versions 1.7.1, but it should work with older versions as well
 tqdm
 ```

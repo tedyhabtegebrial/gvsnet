@@ -160,7 +160,7 @@ class LoadSamples(Dataset):
             mode="P"), dtype=np.uint8)
         sem_img = torch.from_numpy(sem_img).squeeze()
         assert sem_img.max() < self.opts.num_classes, 'semantic ids should be <= num_classes-1 '
-        sem_img = F.interpolate(input=sem_img.unsqueeze(0).unsqueeze(
+        sem_img = F.interpolate(input=sem_img.float().unsqueeze(0).unsqueeze(
             0), size=(self.opts.height, self.opts.width), mode='nearest').squeeze(0)
         # Convert label to one hot
         labels = torch.zeros(self.opts.num_classes,
