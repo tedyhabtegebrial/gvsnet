@@ -1,6 +1,6 @@
 import sys
 import torch
-import apex
+
 import torch.nn as nn
 import torch.nn.functional as F
 from .conv_network import ResBlock

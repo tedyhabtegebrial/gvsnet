@@ -2,7 +2,7 @@ import os
 import torch
 import tqdm
 import cv2 as cv
-import apex
+
 import numpy as np
 
 from torch.utils.data import DataLoader
