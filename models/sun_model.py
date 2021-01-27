@@ -36,9 +36,9 @@ class MulLayerConvNetwork(torch.nn.Module):
         total_output_channels = total_seg_channels + total_alpha_channels + self.total_beta_channels
         self.blending_alpha_seg_beta_pred = nn.Sequential(ResBlock(enc_features, 3),
                                 ResBlock(enc_features, 3),
-                                apex.parallel.SyncBatchNorm(enc_features),
+                                nn.SyncBatchNorm(enc_features),
                                 ConvBlock(enc_features, total_output_channels//2, 3, down_sample=False),
-                                apex.parallel.SyncBatchNorm(total_output_channels//2),
+                                nn.SyncBatchNorm(total_output_channels//2),
                                 ConvBlock(total_output_channels//2,
                                             total_output_channels, 3,
                                             down_sample=False,

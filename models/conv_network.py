@@ -109,9 +109,9 @@ class ConvNetwork(torch.nn.Module):
         self.base_res_layers = nn.Sequential(*[ResBlock(enc_features, 3) for i in range(2)])
         self.blending_alpha_seg_pred = nn.Sequential(ResBlock(enc_features, 3),
                                 ResBlock(enc_features, 3),
-                                apex.parallel.SyncBatchNorm(enc_features),
+                                nn.SyncBatchNorm(enc_features),
                                 ConvBlock(enc_features, int(num_planes*(self.out_seg_chans+1))//2, 3, down_sample=False),
-                                apex.parallel.SyncBatchNorm(int(num_planes*(self.out_seg_chans+1))//2),
+                                nn.SyncBatchNorm(int(num_planes*(self.out_seg_chans+1))//2),
                                 ConvBlock(int(num_planes*(self.out_seg_chans+1))//2,
                                             int(num_planes*(self.out_seg_chans+1)), 3,
                                             down_sample=False,

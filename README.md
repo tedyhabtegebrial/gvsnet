@@ -7,7 +7,6 @@ In NeurIPS 2020
 ```
 python3.6
 torch # tested with versions 1.7.1, but it should work with older versions as well
-apex
 tqdm
 ```
 #### Instructions

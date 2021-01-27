@@ -8,7 +8,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.nn.utils.spectral_norm as spectral_norm
-import apex
 
 # Returns a function that creates a normalization function
 # that does not condition on semantic map
@@ -41,7 +40,7 @@ def get_nonspade_norm_layer(opt, norm_type='instance'):
             norm_layer = nn.BatchNorm2d(get_out_channel(layer), affine=True)
         elif subnorm_type == 'sync_batch':
             # synch batch norm is dropped in favor of pytorch's synch_batch_norm utility
-            norm_layer = apex.parallel.SyncBatchNorm(get_out_channel(layer), affine=True)
+            norm_layer = nn.SyncBatchNorm(get_out_channel(layer), affine=True)
         elif subnorm_type == 'instance':
             norm_layer = nn.InstanceNorm2d(get_out_channel(layer), affine=False)
         else:
@@ -68,7 +67,7 @@ def get_nonspade_norm_layer(opt, norm_type='instance'):
 class SPADE(nn.Module):
     def __init__(self, k_size, norm_nc, label_nc):
         super().__init__()
-        self.param_free_norm = apex.parallel.SyncBatchNorm(norm_nc, affine=False)
+        self.param_free_norm = nn.SyncBatchNorm(norm_nc, affine=False)
 
         nhidden = min(norm_nc, 128)
 
