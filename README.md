@@ -1,7 +1,21 @@
-### Generative View Synthesis: From Single-view Semantics to Novel-view Images
-Generative View Synthesis: From Single-view Semantics to Novel-view Images.<br>
-[Tewodros Habtegebrial](https://tedyhabtegebrial.github.io/),  [Varun Jampani](https://varunjampani.github.io/), [Orazio Gallo](http://alumni.soe.ucsc.edu/~orazio/),  and [Didier Stricker](https://av.dfki.de/members/stricker/).<br>
-In NeurIPS 2020
+<h2 align=center> Generative View Synthesis </h2>
+<div align=center>
+This repository contains code accompanying the paper <br>
+<i>Generative View Synthesis: From Single-view Semantics to Novel-view Images.</i> <span> <a href="https://tedyhabtegebrial.github.io/">Tewodros Habtegebrial</a></span> , 
+<span> <a href="https://varunjampani.github.io/">Varun Jampani</a></span> , 
+<span> <a href="http://alumni.soe.ucsc.edu/~orazio/">Orazio Gallo</a></span> , 
+<span> <a href="https://av.dfki.de/members/stricker/">Didier Stricker</a></span>  
+<br> Presented at NeurIPS 2020. <br> The project page can be found <a href="https://gvsnet.github.io/">here</a>
+</div>
+
+<div align=center width=750px class="row">
+
+<div class="column">
+    <img src="/docs/assets/GVSNet.png">
+  </div>
+</div>
+
+
 
 #### Dependencies
 This code was develped with ```python3.6```

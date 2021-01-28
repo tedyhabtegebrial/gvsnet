@@ -12,7 +12,10 @@ __runs__/
 # C extensions
 *.so
 *.png
+*.gif
 !data/sample_styles/*
+# !docs/assets/carla/*
+!docs/assets/*
 *.caffemodel
 
 # Distribution / packaging
