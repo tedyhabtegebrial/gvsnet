@@ -12,12 +12,12 @@ from .util import find_class_in_module
 
 
 class MultiscaleDiscriminator(BaseNetwork):
-    def __init__(self, opt):
+    def __init__(self, opts):
         super().__init__()
-        self.opt = opt
+        self.opts = opts
 
-        for i in range(opt.num_D):
-            subnetD = netD = NLayerDiscriminator(opt)
+        for i in range(opts.num_D):
+            subnetD = netD = NLayerDiscriminator(opts)
             self.add_module('discriminator_%d' % i, subnetD)
 
     def downsample(self, input):
@@ -26,10 +26,10 @@ class MultiscaleDiscriminator(BaseNetwork):
                             count_include_pad=False)
 
     # Returns list of lists of discriminator outputs.
-    # The final result is of size opt.num_D x opt.n_layers_D
+    # The final result is of size opts.num_D x opts.n_layers_D
     def forward(self, input):
         result = []
-        get_intermediate_features = not self.opt.no_ganFeat_loss
+        get_intermediate_features = not self.opts.no_ganFeat_loss
         for name, D in self.named_children():
             out = D(input)
             if not get_intermediate_features:
@@ -48,23 +48,23 @@ class NLayerDiscriminator(BaseNetwork):
                             help='# layers in each discriminator')
         return parser
 
-    def __init__(self, opt):
+    def __init__(self, opts):
         super().__init__()
-        self.opt = opt
+        self.opts = opts
 
         kw = 4
         padw = int(np.ceil((kw - 1.0) / 2))
-        nf = opt.ndf
-        input_nc = self.compute_D_input_nc(opt)
+        nf = opts.ndf
+        input_nc = self.compute_D_input_nc(opts)
 
-        norm_layer = get_nonspade_norm_layer(opt, opt.norm_D)
+        norm_layer = get_nonspade_norm_layer(opts, opts.norm_D)
         sequence = [[nn.Conv2d(input_nc, nf, kernel_size=kw, stride=2, padding=padw),
                      nn.LeakyReLU(0.2, False)]]
 
-        for n in range(1, opt.n_layers_D):
+        for n in range(1, opts.n_layers_D):
             nf_prev = nf
             nf = min(nf * 2, 512)
-            stride = 1 if n == opt.n_layers_D - 1 else 2
+            stride = 1 if n == opts.n_layers_D - 1 else 2
             sequence += [[norm_layer(nn.Conv2d(nf_prev, nf, kernel_size=kw,
                                                stride=stride, padding=padw)),
                           nn.LeakyReLU(0.2, False)
@@ -76,11 +76,11 @@ class NLayerDiscriminator(BaseNetwork):
         for n in range(len(sequence)):
             self.add_module('model' + str(n), nn.Sequential(*sequence[n]))
 
-    def compute_D_input_nc(self, opt):
-        input_nc = opt.embedding_size + opt.output_nc
-        if opt.contain_dontcare_label:
+    def compute_D_input_nc(self, opts):
+        input_nc = opts.embedding_size + opts.output_nc
+        if opts.contain_dontcare_label:
             input_nc += 1
-        if not opt.no_instance:
+        if not opts.no_instance:
             input_nc += 1
         return input_nc
 
@@ -90,7 +90,7 @@ class NLayerDiscriminator(BaseNetwork):
             intermediate_output = submodel(results[-1])
             results.append(intermediate_output)
 
-        get_intermediate_features = not self.opt.no_ganFeat_loss
+        get_intermediate_features = not self.opts.no_ganFeat_loss
         if get_intermediate_features:
             return results[1:]
         else:

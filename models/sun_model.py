@@ -45,7 +45,6 @@ class MulLayerConvNetwork(torch.nn.Module):
                                             use_no_relu=True))
 
     def forward(self, input_sem):
-        # input_sem = data['input_seg']
         b, _, h, w = input_sem.shape
         feats_0 = self.discriptor_net(input_sem)
         feats_1 = self.base_res_layers(feats_0)
@@ -77,7 +76,28 @@ class SUNModel(torch.nn.Module):
                                                         embedding_size=opts.embedding_size)
 
 
-    def forward(self, input_data):
+    def forward(self, input_data, mode='inference'):
+        if mode=='inference':
+            with torch.no_grad():
+                scene_representation = self._infere_scene_repr(input_data)
+            return scene_representation
+        elif mode=='training':
+            target_sem = input_data['target_seg']
+            seg_mul_layer, alpha, associations = self._infere_scene_repr(input_data)
+            
+            # (mpi_alpha_nv, k_matrix, self.opts.stereo_baseline, t_vec, novel_view=True)
+            semantics_nv = self._render_nv_semantics(
+                input_data, seg_mul_layer, alpha, associations)
+            semantics_loss = self.compute_semantics_loss(semantics_nv, target_sem)
+            if 'input_disp' in input_data.keys():
+                disp_iv = self.alpha_to_disp(
+                    alpha, input_data['k_matrix'], self.opts.stereo_baseline, novel_view=False)
+                disp_loss = F.l1_loss(disp_iv, input_data['input_disp'])
+            sun_loss = {'disp_loss': self.opts.disparity_weight*disp_loss,
+                        'semantics_loss': semantics_loss}
+            return sun_loss
+
+    def _infere_scene_repr(self, input_data):
         # return self.conv_net(input_dict)
         input_seg = input_data['input_seg']
         # k_matrix = input_data['k_matrix']
@@ -93,3 +113,18 @@ class SUNModel(torch.nn.Module):
         alpha = torch.sigmoid(torch.clamp(alpha, min=-100, max=100))
         associations = F.softmax(associations, dim=2)
         return seg_mul_layer, alpha, associations
+
+    def _render_nv_semantics(self, input_data, layered_sem, mpi_alpha, associations):
+        mpi_sem = self.apply_association(layered_sem, input_associations=associations)
+        h_mats = self.compute_homography(
+            kmats=input_data['k_matrix'], r_mats=input_data['r_mat'], t_vecs=input_data['t_vec'])
+        mpi_sem_nv, grid = self.apply_homography(h_matrix=h_mats, src_img=mpi_sem, grid=None)
+        mpi_alpha_nv, _ = self.apply_homography(h_matrix=h_mats, src_img=mpi_alpha, grid=grid)
+        sem_nv = self.alpha_composition(src_imgs=mpi_sem_nv, alpha_imgs=mpi_alpha_nv)
+        if not (self.opts.num_classes == self.opts.embedding_size):
+            sem_nv = self.semantic_embedding.decode(sem_nv)
+        return sem_nv
+
+    def compute_semantics_loss(self, pred_semantics, target_semantics):
+        _, target_seg = target_semantics.max(dim=1)
+        return F.cross_entropy(pred_semantics, target_seg, ignore_index=self.opts.num_classes)

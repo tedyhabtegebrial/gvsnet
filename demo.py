@@ -49,6 +49,6 @@ for itr, data in tqdm.tqdm(enumerate(dataset), total=len(dataset)):
     data['t_vec'] = [t.to(device) for t in data['t_vec']]
     data['r_mat'] = [r.to(device) for r in data['r_mat']]
     # Render the scene from the chosen camera poses
-    results_dict = gvs_net.inference_step(data)
+    results_dict = gvs_net.render_multiple_cams(data)
     saver_results(results_dict, itr)
 print(f'Find results at {opts.output_path}')

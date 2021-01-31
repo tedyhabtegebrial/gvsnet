@@ -19,12 +19,12 @@ from .normalization import SPADE
 # class-conditional GAN architecture using residual block.
 # The code was inspired from https://github.com/LMescheder/GAN_stability.
 class SPADEResnetBlock(nn.Module):
-    def __init__(self, fin, fout, opt):
+    def __init__(self, fin, fout, opts):
         super().__init__()
         # Attributes
         self.learned_shortcut = (fin != fout)
         fmiddle = min(fin, fout)
-        additional_sem_chans = 1 if opt.use_instance_mask else 0
+        additional_sem_chans = 1 if opts.use_instance_mask else 0
         # create conv layers
         self.conv_0 = nn.Conv2d(fin, fmiddle, kernel_size=3, padding=1)
         self.conv_1 = nn.Conv2d(fmiddle, fout, kernel_size=3, padding=1)
@@ -32,17 +32,17 @@ class SPADEResnetBlock(nn.Module):
             self.conv_s = nn.Conv2d(fin, fout, kernel_size=1, bias=False)
 
         # apply spectral norm if specified
-        # if 'spectral' in opt.norm_G:
+        # if 'spectral' in opts.norm_G:
         self.conv_0 = spectral_norm(self.conv_0)
         self.conv_1 = spectral_norm(self.conv_1)
         if self.learned_shortcut:
             self.conv_s = spectral_norm(self.conv_s)
-        # print(opt.spade_k_size, fin, opt.embedding_size+additional_sem_chans)
+        # print(opts.spade_k_size, fin, opts.embedding_size+additional_sem_chans)
         # exit()
-        self.norm_0 = SPADE(opt.spade_k_size, fin, opt.embedding_size+additional_sem_chans)
-        self.norm_1 = SPADE(opt.spade_k_size, fmiddle, opt.embedding_size+additional_sem_chans)
+        self.norm_0 = SPADE(opts.spade_k_size, fin, opts.embedding_size+additional_sem_chans)
+        self.norm_1 = SPADE(opts.spade_k_size, fmiddle, opts.embedding_size+additional_sem_chans)
         if self.learned_shortcut:
-            self.norm_s = SPADE(opt.spade_k_size, fin, opt.embedding_size+additional_sem_chans)
+            self.norm_s = SPADE(opts.spade_k_size, fin, opts.embedding_size+additional_sem_chans)
 
     def forward(self, x, seg):
         x_s = self.shortcut(x, seg)
@@ -117,8 +117,8 @@ class VGG19(torch.nn.Module):
 
 if __name__=='__main__':
 
-    opt = NetworkOptions()
-    spade_res_block = SPADEResnetBlock(1024, 512, opt)
+    opts = NetworkOptions()
+    spade_res_block = SPADEResnetBlock(1024, 512, opts)
     x = torch.rand(1,1024,32,32)
     labels = torch.rand(1,13,256,256)
     out = spade_res_block(x, labels)
