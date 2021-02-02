@@ -47,5 +47,16 @@ CUDA_VSIBLE_DEVICES=0 python demo.py \
 ###### Controlling style of the generated views
 A style image can be pased with the following flag ``` --style_path ```. If not given the color image of input view is used as a style image.
 
+## Training the GVSNet model
+### Datasets
+Fow downloading the datasets used in our experiments please read instructions here [datasets](/docs/datasets.md)
 
+### Traing the Semantic Uplifting Model
+```
+# Instructions coming soon
+```
+### Traing the Layered Translation and Appearance Decoder Networks
+```
+# Instructions coming soon
+```
 Copyright: This repo builds upon the [SPADE](https://github.com/NVlabs/SPADE) repository from NVIDIA

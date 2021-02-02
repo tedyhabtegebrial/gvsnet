@@ -1,27 +1,24 @@
 import os
 import torch
 import tqdm
-import cv2 as cv
-
-import numpy as np
-
 from torch.utils.data import DataLoader
+
 from options import arg_parser
 from models import GVSNet
 from data import LoadSamples
-from data import CarlaMiniLoader
 from utils import SaveResults
 from utils import get_current_time
 from utils import get_cam_poses
 from utils import convert_model
+
+
 arg_parser.add_argument('--movement_type', default='circle', choices=['circle', 'horizontal', 'forward'], 
                         help='camera movement type: ')
 arg_parser.add_argument('--output_path', type=str, default=f'./output/{get_current_time()}', 
                         help='path for saving results')
 arg_parser.add_argument('--pre_trained_model', type=str, default=f'./pre_trained_models/carla/gvsnet_model.pt',
                         help='path for pre_trained_model')
-# arg_parser.add_argument('--output_path', type=str, default=f'./output/{get_current_time()}', 
-#                         help='path for saving results')
+
 
 
 opts = arg_parser.parse_args()

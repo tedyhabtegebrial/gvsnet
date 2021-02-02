@@ -4,6 +4,7 @@
 runs/
 output/
 pre_trained_models/
+logging_path/
 datasets/
 __pycache__/
 __runs__/

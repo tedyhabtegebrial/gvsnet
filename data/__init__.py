@@ -1,2 +1,1 @@
-from .carla_loader import CarlaMiniLoader
-from .carla_loader import LoadSamples
+from .carla_samples_loader import LoadSamples

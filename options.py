@@ -1,9 +1,13 @@
 import argparse
+from utils import get_current_time
 
 arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--gpu_id', type=int, default=0, help='pass -1 for cpu')
 arg_parser.add_argument('--dataset', type=str, default='carla', help='dataset type')
 arg_parser.add_argument('--data_path', type=str, default='', help='folder containing the dataset')
+arg_parser.add_argument('--logging_path', type=str,
+                        default=f'./logging/{get_current_time()}', help='path for saving training logs')
+
 arg_parser.add_argument('--height', type=int, default=256)
 arg_parser.add_argument('--width', type=int, default=256)
 arg_parser.add_argument('--batch_size', type=int, default=1)
