@@ -13,12 +13,23 @@ class Logger(object):
         self.writer = SummaryWriter(logging_path)
         self.iteration = 0
 
-    def log_images(self, input_dict, prefix='color'):
+    def log_depth(self, input_dict):
         input_dict = {k: self.reshape(v) for k, v in input_dict.items()}
-        input_dict = {k: make_grid(v) for k, v in input_dict.items()}
         for k, v in input_dict.items():
-            self.writer(f'{prefix}/{k}', v, self.iteration)
-    
+            v = v / v.amax(dim=(1,2,3), keepdim=True)
+            self.writer.add_image(f'depth/{k}', make_grid(v), self.iteration)
+
+    def log_images(self, input_dict):
+        input_dict = {k: self.reshape(v) for k, v in input_dict.items()}
+        for k, v in input_dict.items():
+            v = (v + 1)/2.0
+            self.writer.add_image(f'color/{k}', make_grid(v), self.iteration)
+
+    def log_scalar(self, input_dict):
+        for k,v in input_dict.items():
+            v = v if isinstance(v, (float, int)) else v.item()
+            self.writer.add_scalar(f'scalar/{k}', v, self.iteration)
+
     def log_semantics(self, input_dict):
         input_dict = {k: self.reshape(v) for k, v in input_dict.items()}
         for k, v in input_dict.items():
@@ -26,7 +37,7 @@ class Logger(object):
                 v = v.argmax(dim=1, keepdim=True)
             imgs = [torch.from_numpy(self.save_semantics.to_color(im)) for im in v]
             imgs = make_grid(torch.stack(imgs))
-            self.writer(f'semantics/{k}', imgs, self.iteration)
+            self.writer.add_image(f'semantics/{k}', imgs, self.iteration)
     
     def step(self): 
         self.iteration += 1
