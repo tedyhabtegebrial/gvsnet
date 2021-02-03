@@ -39,9 +39,9 @@ class SaveSemantics:
         ) == 2, 'input segmentation should be either [H, W] or [1, H, W]'
         self.save_lable(input_seg, file_name)
 
-    def save_lable(self, input_seg, file_name):
+    def to_color(self, input_seg, file_name):
         assert self.num_classes > input_seg.max(), 'Segmentaion mask > num_classes'
-        input_seg = input_seg.int().numpy()
+        input_seg = input_seg.int().squeeze().numpy()
         seg_mask = np.asarray(input_seg, dtype=np.uint8)
         pil_im = Image.fromarray(seg_mask, mode="P")
         pallette_ = []
@@ -50,6 +50,12 @@ class SaveSemantics:
         for _i in range(len(self.pallete.keys()), 256):
             pallette_.extend([0, 0, 0])
         pil_im.putpalette(pallette_)
+        pil_np = np.asarray(pil_im, dtype=np.uint8)
+        return pil_np
+
+    def save_lable(self, input_seg, file_name):
+        col_img = self.to_color(input_seg)        
+        pil_im = Image.fromarray(col_img).convert('PNG')
         pil_im.save(file_name)
 
 
