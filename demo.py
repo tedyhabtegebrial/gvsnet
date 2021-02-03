@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 
 from options import arg_parser
 from models import GVSNet
-from data import LoadSamples
+from data import get_dataset
 from utils import SaveResults
 from utils import get_current_time
 from utils import get_cam_poses
@@ -16,8 +16,6 @@ arg_parser.add_argument('--movement_type', default='circle', choices=['circle', 
                         help='camera movement type: ')
 arg_parser.add_argument('--output_path', type=str, default=f'./output/{get_current_time()}', 
                         help='path for saving results')
-arg_parser.add_argument('--pre_trained_model', type=str, default=f'./pre_trained_models/carla/gvsnet_model.pt',
-                        help='path for pre_trained_model')
 
 
 
@@ -28,13 +26,14 @@ device = f'cuda:{opts.gpu_id}' if opts.gpu_id>-1 else 'cpu'
 os.makedirs(opts.output_path, exist_ok=True)
 
 gvs_net = GVSNet(opts)
-gvs_net.load_state_dict(torch.load(opts.pre_trained_model), strict=True)
+gvs_net.load_state_dict(torch.load(opts.pre_trained_gvsnet), strict=True)
 gvs_net.to(device)
 gvs_net.eval()
 
 if device=='cpu':
     gvs_net = convert_model(gvs_net)
-dataset = DataLoader(LoadSamples(opts), batch_size=1, shuffle=False)
+dataset = DataLoader(get_dataset(opts.dataset)(opts),
+                     batch_size=1, shuffle=False)
 
 saver_results = SaveResults(opts.output_path, opts.dataset)
 

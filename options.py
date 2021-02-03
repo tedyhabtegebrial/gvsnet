@@ -3,17 +3,27 @@ from utils import get_current_time
 
 arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--gpu_id', type=int, default=0, help='pass -1 for cpu')
-arg_parser.add_argument('--dataset', type=str, default='carla', help='dataset type')
-arg_parser.add_argument('--data_path', type=str, default='', help='folder containing the dataset')
-arg_parser.add_argument('--logging_path', type=str,
-                        default=f'./logging/{get_current_time()}', help='path for saving training logs')
-
+arg_parser.add_argument('--dataset', type=str,
+                        default='carla_samples',
+                        help='dataset type: choose from carla_samples, carla, vkitti, cityscapes')
 arg_parser.add_argument('--height', type=int, default=256)
 arg_parser.add_argument('--width', type=int, default=256)
 arg_parser.add_argument('--batch_size', type=int, default=1)
+arg_parser.add_argument('--lr', type=float, default=0.0004)
+
+arg_parser.add_argument('--data_path', type=str, default='/data/teddy/carla', help='folder containing the dataset')
+arg_parser.add_argument('--num_epochs', type=int,
+                        default=30, help='number of training epochs')
+arg_parser.add_argument('--logging_path', type=str,
+                        default=f'./logging/{get_current_time()}', help='path for saving training logs')
+arg_parser.add_argument('--pre_trained_gvsnet', type=str, default=f'./pre_trained_models/carla/gvsnet_model.pt',
+                        help='path for pre_trained_gvsnet')
+arg_parser.add_argument('--pre_trained_sun', type=str, default=f'./pre_trained_models/carla/sun_model.pt',
+                        help='path for sun model| useful when training LTN and ADN models')
 
 arg_parser.add_argument('--num_classes', type=int, default=13)
-arg_parser.add_argument('--embedding_size', type=int, default=13)
+arg_parser.add_argument('--embedding_size', type=int, default=13,
+                        help='when # of semantic classes is large SUN and LTD will be fed with lower dimensoinal embedding of semantics')
 arg_parser.add_argument('--stereo_baseline', type=float, default=0.24, help='assumed baseline for converting depth to disparity')
 arg_parser.add_argument('--style_path', type=str, default='', help='if given the this file will be used as style image')
 arg_parser.add_argument('--use_instance_mask', action='store_true', help='is paased, instance mask will be assuned to be present')
