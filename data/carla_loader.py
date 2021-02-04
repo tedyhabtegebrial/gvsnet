@@ -12,6 +12,41 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 from torch.utils.data import Dataset
 
+carla_pallete = {
+    0: [0, 0, 0],  # None
+    1: [70, 70, 70],  # Buildings
+    2: [190, 153, 153],  # Fences
+    3: [72, 0, 90],  # Other
+    4: [220, 20, 60],  # Pedestrians
+    5: [153, 153, 153],  # Poles
+    6: [157, 234, 50],  # RoadLines
+    7: [128, 64, 128],  # Roads
+    8: [244, 35, 232],  # Sidewalks
+    9: [107, 142, 35],  # Vegetation
+    10: [0, 0, 255],  # Vehicles
+    11: [102, 102, 156],  # Walls
+    12: [220, 220, 0],  # TrafficSigns
+    13: [150, 33, 88],  # TrafficSigns
+    14: [111, 74,  0],
+    15: [81, 0, 81],
+    16: [250, 170, 160],
+    17: [230, 150, 140],
+    18: [180, 165, 180],
+    19: [150, 100, 100],
+    20: [150, 120, 90],
+    21: [250, 170, 30],
+    22: [220, 220,  0],
+    23: [152, 251, 152],
+    24: [70, 130, 180],
+    25: [255, 0, 0],
+    26: [0, 0, 142],
+    27: [0, 0, 70],
+    28: [0, 60, 100],
+    29: [0, 0, 110],
+    20: [0, 80, 100],
+    31: [0, 0, 230],
+    32: [119, 11, 32],
+}
 
 class Carla(Dataset):
 
@@ -26,14 +61,12 @@ class Carla(Dataset):
         self.stereo_baseline = 0.54
 
         self.base_path = f'{opts.data_path}/{opts.mode}'
-        assert os.path.exists(
-            self.base_path), f'{self.base_path} folder doesn"t exist'
+        assert os.path.exists(self.base_path), f'{self.base_path} folder does not exist'
         self.file_list = self.get_file_list()
-        # 
-        self.train_camera_suffix = [f'{str(x).fill(2)}' for x in 5]
-
+        self.train_camera_suffix = [f'_{str(x).zfill(2)}' for x in range(5)]
+        
     def get_file_list(self):
-        if self.mode == 'train':
+        if self.opts.mode == 'train':
             ''' For training we load a single view from a random camera group, town, weather condition and time step.
             A sample file in the returned list would look like
                  .../Town04/weather_03/HorizontalCameras/rgb/009990.png
@@ -45,8 +78,8 @@ class Carla(Dataset):
             episode_folders = [
                 f'Town0{x}/weather_0{y}' for x in range(1, 6) for y in range(4)]
             camera_groups = ['ForwardCameras','SideCameras', 'HorizontalCameras']
-            join = lambda x:os.path.join(a for a in x)
-            file_list = [join([epi, cam, f'rgb/{str(x).zfill(6)}.png']) for epi in episode_folders
+            join = lambda x:os.path.join(*x)
+            file_list = [join([self.base_path, epi, cam, f'rgb/{str(x).zfill(6)}.png']) for epi in episode_folders
                             for cam in camera_groups \
                                 for x in range(0, 10000, 10)]
             return file_list
@@ -67,7 +100,7 @@ class Carla(Dataset):
             return test_frames
 
     def __getitem__(self, index):
-        if self.mode=='train':
+        if self.opts.mode=='train':
             sample = self.file_list[index]
             trg_cam, src_cam = random.sample(self.train_camera_suffix, 2)
             cam_group = Path(sample).parent.parent.stem
@@ -80,9 +113,8 @@ class Carla(Dataset):
         k_matrix = self._carla_k_matrix(self.height, self.width)
         input_disp = self._read_disp(src_file.replace('rgb', 'depth'), k_matrix)
         target_disp = self._read_disp(trg_file.replace('rgb', 'depth'), k_matrix)
-        input_seg = self._read_disp(src_file.replace('rgb', 'semantic_segmentation'), k_matrix)
-        target_seg = self._read_disp(trg_file.replace(
-            'rgb', 'semantic_segmentation'), k_matrix)
+        input_seg = self._read_seg(src_file.replace('rgb', 'semantic_segmentation'))
+        target_seg = self._read_seg(trg_file.replace('rgb', 'semantic_segmentation'))
         r_mat, t_vec = self._get_rel_pose(src_file, trg_file)
         data_dict = {}
         data_dict['input_img'] = input_img
@@ -132,12 +164,11 @@ class Carla(Dataset):
     def _read_disp(self, depth_path, k_matrix):
         depth_img = self._read_depth(depth_path).squeeze()
         disp_img = self.stereo_baseline * \
-            k_matrix / (depth_img.clamp(min=1e-06)).squeeze()
+            (k_matrix[0, 0]).view(1, 1) / (depth_img.clamp(min=1e-06)).squeeze()
         h, w = disp_img.shape[:2]
-        if h!=self.height or w!=self.width:
-            disp_img = disp_img.view(1, 1, h, w)
-            disp_img = F.interpolate(disp_img, size=(self.height, self.width), 
-                                    mode='bilinear', align_corners=False)
+        disp_img = disp_img.view(1, 1, h, w)
+        disp_img = F.interpolate(disp_img, size=(self.height, self.width), 
+                                mode='bilinear', align_corners=False)
         disp_img = disp_img.view(1, self.height, self.width)
         return disp_img
 
@@ -153,9 +184,24 @@ class Carla(Dataset):
         return labels
 
     def _read_seg(self, semantics_path):
+        # print(semantics_path)
         seg = cv.imread(semantics_path, cv.IMREAD_ANYCOLOR |
                         cv.IMREAD_ANYDEPTH)
         seg = np.asarray(seg, dtype=np.uint8)
+        # if seg.max()>13:
+        #     print('here',semantics_path)
+        #     exit()
+        # if seg.max()>self.opts.num_classes:
+        # im = Image.fromarray(seg).convert("P")
+        # im = Image.open(semantics_path)
+        # pal = []
+        # for k,v in carla_pallete.items():
+        #     pal.extend(v)
+        # for i in range(len(pal), 256):
+        #     pal.extend([0,0,0])
+        # im.putpalette(pal)#.convert('RGB')
+        # im.save('samantic.png')
+        # exit()
         seg = torch.from_numpy(seg[..., 2]).float().squeeze()
         h, w = seg.shape
         seg = F.interpolate(seg.view(1, 1, h, w), size=(self.height, self.width),

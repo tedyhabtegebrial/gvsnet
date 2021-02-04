@@ -15,7 +15,7 @@ from .architecture import VGG19
 # that has the same size as the input
 class GANLoss(nn.Module):
     def __init__(self, gan_mode, opts, target_real_label=1.0, target_fake_label=0.0,
-                 tensor=torch.FloatTensor, opts=None):
+                 tensor=torch.FloatTensor):
         super(GANLoss, self).__init__()
         self.real_label = target_real_label
         self.fake_label = target_fake_label
