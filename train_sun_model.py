@@ -29,9 +29,11 @@ os.makedirs(model_path, exist_ok=True)
 os.makedirs(image_path, exist_ok=True)
 
 # Initialize process group
+
 device = f'cuda:{opts.local_rank}'
 os.environ['MASTER_ADDR'] = 'localhost'
-os.environ['MASTER_PORT'] = '6002'
+os.environ['MASTER_PORT'] = f'8070'
+# Launch processes
 torch.cuda.set_device(opts.local_rank)
 torch.distributed.init_process_group(
     'nccl',
@@ -39,7 +41,6 @@ torch.distributed.init_process_group(
     world_size=opts.ngpu,
     rank=opts.local_rank,
 )
-
 # Create model
 model = SUNModel(opts)
 model = model.to(device)
@@ -48,8 +49,8 @@ model_ddp = DDP(
     model,
     device_ids=[opts.local_rank],
     output_device=opts.local_rank,
-    find_unused_parameters=True
 )
+# find_unused_parameters=True
 
 optimizer = torch.optim.Adam(model.parameters(), lr=opts.lr)
 optimizer.zero_grad()

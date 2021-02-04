@@ -91,7 +91,7 @@ class Carla(Dataset):
                 .../Town04/weather_03/HorizontalCameras_01/rgb/000000.png
             '''
             test_frames = []
-            with open(os.path.join(os.getcwd(), 'data/carla_test_frames.txt'), 'r') as fid:
+            with open(os.path.join(self.opts.data_path, 'carla_test_frames.txt'), 'r') as fid:
                 reader = csv.reader(fid)
                 for line in reader:
                     src = os.path.join(self.base_path, line[0])
