@@ -53,7 +53,19 @@ Fow downloading the datasets used in our experiments please read instructions he
 
 ### Traing the Semantic Uplifting Model
 ```
-# Instructions coming soon
+cd scripts
+python -m torch.distributed.launch --nproc_per_node=1 --nnodes=1 \
+            ../train_sun_model.py \
+            --ngpu=1 \
+            --dataset=carla \
+            --stereo_baseline=0.54 \
+            --batch_size=2 \
+            --num_epochs=30 \
+            --mode=train \
+            --port=6071 \
+            --data_path=/path/to/carla/ \
+            --logging_path=/path/to/logging \
+            --image_log_interval=2000 \
 ```
 ### Traing the Layered Translation and Appearance Decoder Networks
 ```
