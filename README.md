@@ -47,11 +47,11 @@ CUDA_VSIBLE_DEVICES=0 python demo.py \
 ###### Controlling style of the generated views
 A style image can be pased with the following flag ``` --style_path ```. If not given the color image of input view is used as a style image.
 
-## Training the GVSNet model
-### Datasets
+### Training the GVSNet model
+#### Datasets
 Fow downloading the datasets used in our experiments please read instructions here [datasets](/docs/datasets.md)
-
-### Traing the Semantic Uplifting Model
+Please check the ```scripts``` folder training scripts and check ```options.py``` for a list of commandline arguments.
+#### Traing the Semantic Uplifting Model
 Recommended batch sizes and number of epochs
   * ``` sun model ``` batch_size=12 and above, num_epochs=30
 ```
@@ -59,7 +59,7 @@ cd scripts
 ./train_sun_carla
 
 ```
-### Traing the Layered Translation and Appearance Decoder Networks
+#### Traing the Layered Translation and Appearance Decoder Networks
 Recommended batch sizes and number of epochs
   * ``` ltn+adn ``` batch_size=16 and above, num_epochs=20
 ```
