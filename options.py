@@ -73,6 +73,8 @@ arg_parser.add_argument('--num_upsampling_layers',
 arg_parser.add_argument('--num_out_channels', default=3, type=int)
 arg_parser.add_argument('--use_vae', action='store_false') # TODO: This should be updated
 arg_parser.add_argument('--aspect_ratio', default=1, type=int)
+arg_parser.add_argument('--gen_lr', default=0.0001, type=float)
+arg_parser.add_argument('--disc_lr', default=0.0004, type=float)
 
 ## Training options
 arg_parser.add_argument('--disparity_weight', default=0.1, type=float, 

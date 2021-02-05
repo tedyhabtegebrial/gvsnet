@@ -17,7 +17,7 @@ from .mpi import ApplyAssociation
 from .spade import VGGLoss
 from .spade import KLDLoss
 from .spade import GANLoss
-
+from .spade import MultiscaleDiscriminator
 
 class GVSNet(nn.Module):
     def __init__(self, opts):
@@ -40,6 +40,8 @@ class GVSNet(nn.Module):
         spade_ltn_opts.__dict__['embedding_size'] = opts.num_layers * opts.embedding_size
         spade_ltn_opts.__dict__['label_nc'] = opts.num_layers*opts.embedding_size
         self.spade_ltn = SPADEGenerator(spade_ltn_opts, no_tanh=True)
+        # Discriminator
+        self.discriminator = MultiscaleDiscriminator(opts)
         # MPI rendering
         self.compute_homography = ComputeHomography(opts)
         self.alpha_composition = AlphaComposition()
@@ -115,6 +117,8 @@ class GVSNet(nn.Module):
             color_nv, kld_loss = self.generate_fake(input_data)
             gen_losses = self.compute_generator_loss(color_nv, input_data['target_img'], input_data['target_seg'])
             gen_losses['kld_loss'] = kld_loss
+            self.real = input_data['target_img']
+            self.fake = color_nv.data
             return gen_losses
         elif mode == 'discriminator':
             disc_losses = self.compute_discriminator_loss(input_data)
@@ -148,6 +152,7 @@ class GVSNet(nn.Module):
         # Infer scene semantics and geometry
         with torch.no_grad():
             layered_sem, mpi_alpha, associations = self.sun(input_data)
+            layered_sem = F.softmax(layered_sem, dim=2)
         layered_sem = layered_sem.flatten(1, 2)
         layered_appearance = self.spade_ltn(layered_sem, z=z).view(batch_size, num_layers, feats_per_layer, height, width)
         mpi_appearance = self.apply_association(layered_appearance, input_associations=associations)
@@ -156,7 +161,7 @@ class GVSNet(nn.Module):
         # Compute planar homography
         h_mats = self.compute_homography(
             kmats=input_data['k_matrix'], r_mats=r_mat, t_vecs=t_vec)
-        mpi_alpha_nv, grid = self.apply_homography(h_matrix=h_mats, src_img=mpi_alpha, h_mats=h_mats)
+        mpi_alpha_nv, grid = self.apply_homography(h_matrix=h_mats, src_img=mpi_alpha)
         mpi_app_nv, _ = self.apply_homography(h_matrix=h_mats, src_img=mpi_appearance, grid=grid)
         appearance_nv = self.alpha_composition(src_imgs=mpi_app_nv, alpha_imgs=mpi_alpha_nv)
         color_nv = self.adn(appearance_nv)
@@ -174,7 +179,7 @@ class GVSNet(nn.Module):
             pred_fake, True, for_discriminator=False))
         if not self.opts.no_ganFeat_loss:
             num_D = len(pred_fake)
-            GAN_Feat_loss = self.FloatTensor(1).fill_(0).to(device_)
+            GAN_Feat_loss = torch.FloatTensor(1).fill_(0).to(device_)
             for i in range(num_D):
                 # for each discriminator
                 # last output is the final prediction, so we exclude it
@@ -215,3 +220,18 @@ class GVSNet(nn.Module):
         discriminator_out = self.discriminator(fake_and_real)
         pred_fake, pred_real = self.divide_pred(discriminator_out)
         return pred_fake, pred_real
+
+    def divide_pred(self, pred):
+        # the prediction contains the intermediate outputs of multiscale GAN,
+        # so it's usually a list
+        if type(pred) == list:
+            fake = []
+            real = []
+            for p in pred:
+                fake.append([tensor[:tensor.size(0) // 2] for tensor in p])
+                real.append([tensor[tensor.size(0) // 2:] for tensor in p])
+        else:
+            fake = pred[:pred.size(0) // 2]
+            real = pred[pred.size(0) // 2:]
+
+        return fake, real

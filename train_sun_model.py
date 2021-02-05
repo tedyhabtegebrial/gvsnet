@@ -90,10 +90,12 @@ else:
         output_device=opts.local_rank,)
 
 scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_func(opts.num_epochs), last_epoch=-1)
-logger = Logger(opts.logging_path)
+logger = Logger(opts.logging_path) if opts.local_rank == 0 else None
 for epoch in range(opts.num_epochs):
     optimizer.zero_grad()
     sampler.set_epoch(epoch)
+    if logger:
+        logger.save_model(model, epoch)
     with tqdm.tqdm(total=len(data_loader)) if opts.local_rank == 0 else dummy_progress_bar() as progress_bar:
         for itr, data in enumerate(data_loader):
             data = {k:v.float().to(device) for k,v in data.items()}
@@ -103,7 +105,7 @@ for epoch in range(opts.num_epochs):
             optimizer.step()
             optimizer.zero_grad()
             # Logging loss, predicted images etc
-            if opts.local_rank == 0:
+            if logger:
                 logger.log_scalar(loss_dict)
                 if itr % opts.image_log_interval == 0:
                     pred_sem_nv = semantics_nv.data.squeeze().cpu()
@@ -121,6 +123,5 @@ for epoch in range(opts.num_epochs):
                                         sem_loss=loss_dict['semantics_loss'].item(),
                                         lr=optimizer.param_groups[0]['lr'])
                 progress_bar.update(1)
-            logger.step()
-        # if opts.local_rank == 0 and False:
-        #     logger.save_model()
+            if logger:
+                logger.step()

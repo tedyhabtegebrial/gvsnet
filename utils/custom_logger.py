@@ -79,5 +79,10 @@ class Logger(object):
 
     def step(self): 
         self.iteration += 1
+    
+    def save_model(self, model, epoch):
+        state_dict = {k:v.clone().cpu() for k,v in model.state_dict().items()}
+        fname = os.path.join(self.logging_path, 'models', f'model_epoch_{epoch}.pt')
+        torch.save(state_dict, fname)
 
 
