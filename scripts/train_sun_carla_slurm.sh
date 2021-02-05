@@ -1,4 +1,4 @@
-srun -K --ntasks=3 --pty --gpus-per-task=1 --cpus-per-gpu=6 --mem-per-cpu=6G -p RTX2080Ti-AV -N 1 \
+srun -K --ntasks=3 --gpus-per-task=1 --cpus-per-gpu=6 --mem-per-cpu=6G -p RTX2080Ti-AV -N 1 \
         --container-mounts=/netscratch:/netscratch,/ds:/ds,`pwd`:`pwd` \
         --container-image=/netscratch/enroot/dlcc_pytorch_20.07.sqsh  \
         --container-workdir=`pwd` --export="NCCL_SOCKET_IFNAME=bond,NCCL_IB_HCA=mlx5" \
@@ -11,4 +11,5 @@ srun -K --ntasks=3 --pty --gpus-per-task=1 --cpus-per-gpu=6 --mem-per-cpu=6G -p 
             --port=6071 \
             --slurm \
             --data_path=/netscratch/teddy/carla/raw256x256 \
-            --logging_path=/netscratch/teddy/gvsnet_expts/carla/sun
+            --logging_path=/netscratch/teddy/gvsnet_expts/carla/sun \
+            --image_log_interval=2000 \
