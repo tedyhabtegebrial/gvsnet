@@ -5,7 +5,7 @@ This repository contains code accompanying the paper <br>
 <span> <a href="https://varunjampani.github.io/">Varun Jampani</a></span> , 
 <span> <a href="http://alumni.soe.ucsc.edu/~orazio/">Orazio Gallo</a></span> , 
 <span> <a href="https://av.dfki.de/members/stricker/">Didier Stricker</a></span>  
-<br> Presented at NeurIPS 2020. <br> The project page can be found <a href="https://gvsnet.github.io/">here</a>
+<br> Thirty-fourth Conference on Neural Information Processing Systems (NeurIPS-2020) <br> The project page can be found <a href="https://gvsnet.github.io/">here</a>
 </div>
 
 <div align=center width=750px class="row">
