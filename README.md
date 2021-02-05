@@ -54,13 +54,14 @@ Fow downloading the datasets used in our experiments please read instructions he
 ### Traing the Semantic Uplifting Model
 Recommended batch sizes and number of epochs
   * ``` sun model ``` batch_size=12 and above, num_epochs=30
-  * ``` ltn+adn ``` batch_size=16 and above, num_epochs=20 
 ```
 cd scripts
 ./train_sun_carla
 
 ```
 ### Traing the Layered Translation and Appearance Decoder Networks
+Recommended batch sizes and number of epochs
+  * ``` ltn+adn ``` batch_size=16 and above, num_epochs=20
 ```
 cd scripts
 ./train_gvs_carla.sh
