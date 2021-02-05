@@ -95,7 +95,7 @@ class SUNModel(torch.nn.Module):
                 disp_loss = F.l1_loss(disp_iv, input_data['input_disp'])
             sun_loss = {'disp_loss': self.opts.disparity_weight*disp_loss,
                         'semantics_loss': semantics_loss}
-            return sun_loss, semantics_nv
+            return sun_loss, semantics_nv.data, disp_iv.data
 
     def _infere_scene_repr(self, input_data):
         # return self.conv_net(input_dict)
@@ -107,7 +107,7 @@ class SUNModel(torch.nn.Module):
         # Compute MPI alpha, multi layer semantics and layer to plane associations
         alpha, seg_mul_layer, associations = self.conv_net(input_seg_)
         # Append the input semantics to the multi layer semantics
-        seg_mul_layer = F.softmax(seg_mul_layer, dim=2)
+        
         seg_mul_layer = torch.cat([input_seg_.unsqueeze(1), seg_mul_layer], dim=1)
         # torch.cat([input_seg_.unsqueeze(1), F.softmax(seg_mul_plane, dim=2)], dim=1)
         alpha = torch.sigmoid(torch.clamp(alpha, min=-100, max=100))
@@ -127,4 +127,7 @@ class SUNModel(torch.nn.Module):
 
     def compute_semantics_loss(self, pred_semantics, target_semantics):
         _, target_seg = target_semantics.max(dim=1)
+        # if self.opts.local_rank==0:
+        #     print(pred_semantics.shape, target_seg.shape)
+        #     print(pred_semantics.shape, pred_semantics.min(), pred_semantics.max())
         return F.cross_entropy(pred_semantics, target_seg, ignore_index=self.opts.num_classes)

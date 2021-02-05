@@ -39,7 +39,7 @@ class SaveSemantics:
         ) == 2, 'input segmentation should be either [H, W] or [1, H, W]'
         self.save_lable(input_seg, file_name)
 
-    def to_color(self, input_seg, file_name):
+    def to_color(self, input_seg):
         assert self.num_classes > input_seg.max(), 'Segmentaion mask > num_classes'
         input_seg = input_seg.int().squeeze().numpy()
         seg_mask = np.asarray(input_seg, dtype=np.uint8)

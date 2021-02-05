@@ -53,6 +53,7 @@ class GVSNet(nn.Module):
     def _infere_scene_repr(self, input_data):
         layered_sem, mpi_alpha, associations = self.sun(input_data)
         scene_style = self._get_scene_encoding(input_data['style_img'])
+        layered_sem = F.softmax(layered_sem, dim=2)
         return scene_style, layered_sem, mpi_alpha, associations
 
     def render_multiple_cams(self, input_data):
@@ -69,6 +70,7 @@ class GVSNet(nn.Module):
             # scene_style = self._get_scene_encoding(input_data['style_img'])
             # Infer scene semantics and geometry
             scene_style, layered_sem, mpi_alpha, associations = self._infere_scene_repr(input_data)
+            
             # Render Novel-view semantics and color
             mpi_sem = self.apply_association(layered_sem, input_associations=associations)
             # convert layered semantics to layered appearance

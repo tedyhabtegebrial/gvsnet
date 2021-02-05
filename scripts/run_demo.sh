@@ -1,4 +1,4 @@
-CUDA_VSIBLE_DEVICES=0 python demo.py \
+CUDA_VSIBLE_DEVICES=0 python ../demo.py \
     --dataset=carla_samples \
     --mode=demo \
     --movement_type=circle \
