@@ -25,7 +25,7 @@ def animate_files(input_files, output_file_name):
 class SaveSemantics:
     '''
     Currently supports the following datasets
-    ['carla', 'scenenet_rgbd', 'scan_net']
+    ['carla', 'vkitti', 'cityscapes']
     '''
 
     def __init__(self, dataset_name):

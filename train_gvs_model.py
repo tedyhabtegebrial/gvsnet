@@ -20,13 +20,11 @@ random.seed(12345)
 
 arg_parser.add_argument('--ngpu', type=int, default=1)
 arg_parser.add_argument('--local_rank', type=int, default=0)
-# arg_parser.add_argument('--port', type=int, default=8008)
 opts = arg_parser.parse_args()
 
 # Initialize process group
 if opts.slurm:
     def init_process_group():
-        # os.environ['NCCL_IB_DISABLE'] = '1'
         local_rank = int(os.getenv('LOCAL_RANK', 0))
         rank = int(os.getenv('RANK', 0))
         world_size = int(os.getenv('WORLD_SIZE', 1))

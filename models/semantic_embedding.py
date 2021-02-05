@@ -5,7 +5,6 @@ import torch.nn.functional as F
 
 class SemanticEmbedding(nn.Module):
     def __init__(self,num_classes, embedding_size):
-        # configs['num_classes'], configs['embedding_size']
         super(SemanticEmbedding, self).__init__()
         size_1 = num_classes
         size_2 = int(0.8*num_classes + 0.2*embedding_size)

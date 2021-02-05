@@ -12,7 +12,7 @@ arg_parser.add_argument('--batch_size', type=int, default=1)
 arg_parser.add_argument('--lr', type=float, default=0.0004)
 
 arg_parser.add_argument('--slurm', action='store_true')
-arg_parser.add_argument('--port', type=int, default='9081')
+arg_parser.add_argument('--port', type=int, default='7007')
 arg_parser.add_argument('--data_path', type=str, default='/data/teddy/carla', help='folder containing the dataset')
 arg_parser.add_argument('--num_epochs', type=int,
                         default=30, help='number of training epochs')

@@ -20,7 +20,6 @@ random.seed(12345)
 
 arg_parser.add_argument('--ngpu', type=int, default=1)
 arg_parser.add_argument('--local_rank', type=int, default=0)
-# arg_parser.add_argument('--port', type=int, default=8008)
 opts = arg_parser.parse_args()
 
 # Initialize process group
@@ -43,7 +42,6 @@ else:
     device = f'cuda:{opts.local_rank}'
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = f'{opts.port}'
-    # Launch processes
     torch.cuda.set_device(opts.local_rank)
     torch.distributed.init_process_group(
         'nccl',

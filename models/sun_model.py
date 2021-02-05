@@ -84,8 +84,6 @@ class SUNModel(torch.nn.Module):
         elif mode=='training':
             target_sem = input_data['target_seg']
             seg_mul_layer, alpha, associations = self._infere_scene_repr(input_data)
-            
-            # (mpi_alpha_nv, k_matrix, self.opts.stereo_baseline, t_vec, novel_view=True)
             semantics_nv = self._render_nv_semantics(
                 input_data, seg_mul_layer, alpha, associations)
             semantics_loss = self.compute_semantics_loss(semantics_nv, target_sem)
@@ -100,16 +98,12 @@ class SUNModel(torch.nn.Module):
     def _infere_scene_repr(self, input_data):
         # return self.conv_net(input_dict)
         input_seg = input_data['input_seg']
-        # k_matrix = input_data['k_matrix']
-        # t_vec, r_mat = input_data['t_vec'], input_data['rot_mat']
         encoding_needed = not (self.opts.num_classes==self.opts.embedding_size)
         input_seg_ = self.semantic_embedding.encode(input_seg) if encoding_needed else input_seg
         # Compute MPI alpha, multi layer semantics and layer to plane associations
         alpha, seg_mul_layer, associations = self.conv_net(input_seg_)
-        # Append the input semantics to the multi layer semantics
-        
+        # Append the input semantics to the multi layer semantics        
         seg_mul_layer = torch.cat([input_seg_.unsqueeze(1), seg_mul_layer], dim=1)
-        # torch.cat([input_seg_.unsqueeze(1), F.softmax(seg_mul_plane, dim=2)], dim=1)
         alpha = torch.sigmoid(torch.clamp(alpha, min=-100, max=100))
         associations = F.softmax(associations, dim=2)
         return seg_mul_layer, alpha, associations
@@ -127,7 +121,4 @@ class SUNModel(torch.nn.Module):
 
     def compute_semantics_loss(self, pred_semantics, target_semantics):
         _, target_seg = target_semantics.max(dim=1)
-        # if self.opts.local_rank==0:
-        #     print(pred_semantics.shape, target_seg.shape)
-        #     print(pred_semantics.shape, pred_semantics.min(), pred_semantics.max())
         return F.cross_entropy(pred_semantics, target_seg, ignore_index=self.opts.num_classes)

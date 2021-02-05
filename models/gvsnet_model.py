@@ -65,22 +65,15 @@ class GVSNet(nn.Module):
         with torch.no_grad():
             batch_size = input_data['input_seg'].shape[0]
             num_layers = self.opts.num_layers
-            # , self.opts.embedding_size
             height, width = self.opts.height, self.opts.width
             feats_per_layer = self.opts.feats_per_layer
-            # Get style encoding of the scene
-            # scene_style = self._get_scene_encoding(input_data['style_img'])
             # Infer scene semantics and geometry
             scene_style, layered_sem, mpi_alpha, associations = self._infere_scene_repr(input_data)
             
             # Render Novel-view semantics and color
             mpi_sem = self.apply_association(layered_sem, input_associations=associations)
-            # convert layered semantics to layered appearance
-            # mul_layer_sem
             layered_sem = layered_sem.flatten(1, 2)
-            # .view(batch_size, num_layers*embedding_size, height, width)
             layered_appearance = self.spade_ltn(layered_sem, z=scene_style).view(batch_size, num_layers, feats_per_layer, height, width)
-            # layered appearance to MPI appearance
             mpi_appearance = self.apply_association(
                 layered_appearance, input_associations=associations)
             for v in range(len(input_data['t_vec'])):
@@ -106,7 +99,6 @@ class GVSNet(nn.Module):
                 disp_nv_list.append(disp_nv)
                 sem_nv_list.append(sem_nv)
         result_dict = {}
-        # result_dict['color_nv']  =  [Num_Cameras, Batch_Size, 3, Height, Width]
         result_dict['color_nv'] = torch.stack(color_nv_list)
         result_dict['disp_nv'] = torch.stack(disp_nv_list)
         result_dict['sem_nv'] = torch.stack(sem_nv_list)

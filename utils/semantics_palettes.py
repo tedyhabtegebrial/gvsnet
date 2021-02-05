@@ -181,8 +181,6 @@ scan_net_pallete = {
 def get_palette(dataset_name):
     pallet_map = {}
     pallet_map['carla'] = carla_pallete
-    # pallet_map['scan_net'] = scan_net_pallete
-    # pallet_map['scenenet_rgbd'] = scene_net_pallete
     pallet_map['vkitti'] = vkitti_pallete
     pallet_map['cityscapes'] = cityscapes_pallete
     assert dataset_name in pallet_map.keys(
