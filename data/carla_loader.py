@@ -12,41 +12,6 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 from torch.utils.data import Dataset
 
-carla_pallete = {
-    0: [0, 0, 0],  # None
-    1: [70, 70, 70],  # Buildings
-    2: [190, 153, 153],  # Fences
-    3: [72, 0, 90],  # Other
-    4: [220, 20, 60],  # Pedestrians
-    5: [153, 153, 153],  # Poles
-    6: [157, 234, 50],  # RoadLines
-    7: [128, 64, 128],  # Roads
-    8: [244, 35, 232],  # Sidewalks
-    9: [107, 142, 35],  # Vegetation
-    10: [0, 0, 255],  # Vehicles
-    11: [102, 102, 156],  # Walls
-    12: [220, 220, 0],  # TrafficSigns
-    13: [150, 33, 88],  # TrafficSigns
-    14: [111, 74,  0],
-    15: [81, 0, 81],
-    16: [250, 170, 160],
-    17: [230, 150, 140],
-    18: [180, 165, 180],
-    19: [150, 100, 100],
-    20: [150, 120, 90],
-    21: [250, 170, 30],
-    22: [220, 220,  0],
-    23: [152, 251, 152],
-    24: [70, 130, 180],
-    25: [255, 0, 0],
-    26: [0, 0, 142],
-    27: [0, 0, 70],
-    28: [0, 60, 100],
-    29: [0, 0, 110],
-    20: [0, 80, 100],
-    31: [0, 0, 230],
-    32: [119, 11, 32],
-}
 
 class Carla(Dataset):
 
@@ -110,7 +75,7 @@ class Carla(Dataset):
             src_file, trg_file = self.file_list[index][0], self.file_list[index][1]
         input_img = self._read_rgb(src_file)
         target_img = self._read_rgb(trg_file)
-        k_matrix = self._carla_k_matrix(self.height, self.width)
+        k_matrix = self._carla_k_matrix(height=self.height, width=self.width, fov=90)
         input_disp = self._read_disp(src_file.replace('rgb', 'depth'), k_matrix)
         target_disp = self._read_disp(trg_file.replace('rgb', 'depth'), k_matrix)
         input_seg = self._read_seg(src_file.replace('rgb', 'semantic_segmentation'))
@@ -184,24 +149,9 @@ class Carla(Dataset):
         return labels
 
     def _read_seg(self, semantics_path):
-        # print(semantics_path)
         seg = cv.imread(semantics_path, cv.IMREAD_ANYCOLOR |
                         cv.IMREAD_ANYDEPTH)
         seg = np.asarray(seg, dtype=np.uint8)
-        # if seg.max()>13:
-        #     print('here',semantics_path)
-        #     exit()
-        # if seg.max()>self.opts.num_classes:
-        # im = Image.fromarray(seg).convert("P")
-        # im = Image.open(semantics_path)
-        # pal = []
-        # for k,v in carla_pallete.items():
-        #     pal.extend(v)
-        # for i in range(len(pal), 256):
-        #     pal.extend([0,0,0])
-        # im.putpalette(pal)#.convert('RGB')
-        # im.save('samantic.png')
-        # exit()
         seg = torch.from_numpy(seg[..., 2]).float().squeeze()
         h, w = seg.shape
         seg = F.interpolate(seg.view(1, 1, h, w), size=(self.height, self.width),

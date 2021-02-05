@@ -18,6 +18,7 @@ arg_parser.add_argument('--num_epochs', type=int,
                         default=30, help='number of training epochs')
 arg_parser.add_argument('--logging_path', type=str,
                         default=f'./logging/{get_current_time()}', help='path for saving training logs')
+arg_parser.add_argument('--image_log_interval', default=1000, type=int, help='number of iterations for saving intemediate outputs')
 arg_parser.add_argument('--pre_trained_gvsnet', type=str, default=f'./pre_trained_models/carla/gvsnet_model.pt',
                         help='path for pre_trained_gvsnet')
 arg_parser.add_argument('--pre_trained_sun', type=str, default=f'./pre_trained_models/carla/sun_model.pt',

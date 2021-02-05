@@ -59,7 +59,6 @@ if opts.local_rank == 0:
     image_path = os.path.join(opts.logging_path, 'images')
     os.makedirs(model_path, exist_ok=True)
     os.makedirs(image_path, exist_ok=True)
-
 # Create model
 model = SUNModel(opts)
 model = model.to(device)
@@ -91,7 +90,7 @@ else:
         output_device=opts.local_rank,)
 
 scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_func(opts.num_epochs), last_epoch=-1)
-logger = Logger(opts.logging_path, opts.dataset)
+logger = Logger(opts.logging_path)
 for epoch in range(opts.num_epochs):
     optimizer.zero_grad()
     sampler.set_epoch(epoch)
@@ -104,17 +103,19 @@ for epoch in range(opts.num_epochs):
             optimizer.step()
             optimizer.zero_grad()
             # Logging loss, predicted images etc
-            if opts.local_rank==0:
+            if opts.local_rank == 0:
                 logger.log_scalar(loss_dict)
-                pred_sem_nv = semantics_nv.data.squeeze().cpu()
-                target_sem_nv = data['target_seg'].squeeze().cpu()
-                input_sem = data['input_seg'].squeeze().cpu()
-                logger.log_semantics({'pred_sem_novel_v': pred_sem_nv})
-                logger.log_semantics({'target_sem_novel_v': target_sem_nv})
-                logger.log_semantics({'target_sem_input_v': input_sem})
-                logger.log_images({'target_rgb_input_v': data['input_img']})
-                logger.log_depth({'target_input_v': data['input_disp'].cpu()})
-                logger.log_depth({'pred_disp_input_v': disp_iv.cpu()})
+                if itr % opts.image_log_interval == 0:
+                    pred_sem_nv = semantics_nv.data.squeeze().cpu()
+                    target_sem_nv = data['target_seg'].squeeze().cpu()
+                    input_sem = data['input_seg'].squeeze().cpu()
+                    logger.save_semantics({'sem_pred_novel_v': pred_sem_nv[0]})
+                    logger.save_semantics({'sem_gt_novel_v': target_sem_nv[0]})
+                    logger.save_semantics({'sem_gt_input_v': input_sem[0]})
+                    logger.save_images({'rgb_gt_input_v': data['input_img'][0].cpu()})
+                    logger.save_depth(
+                        {'disp_gt_input_v': data['input_disp'][0].cpu()})
+                    logger.save_depth({'disp_pred_input_v': disp_iv[0].cpu()})
             if progress_bar:
                 progress_bar.set_postfix(disp_loss=loss_dict['disp_loss'].item(),
                                         sem_loss=loss_dict['semantics_loss'].item(),

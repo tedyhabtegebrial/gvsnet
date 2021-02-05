@@ -50,7 +50,7 @@ class SaveSemantics:
         for _i in range(len(self.pallete.keys()), 256):
             pallette_.extend([0, 0, 0])
         pil_im.putpalette(pallette_)
-        pil_np = np.asarray(pil_im, dtype=np.uint8)
+        pil_np = np.asarray(pil_im.convert('RGB'), dtype=np.uint8)
         return pil_np
 
     def save_lable(self, input_seg, file_name):
