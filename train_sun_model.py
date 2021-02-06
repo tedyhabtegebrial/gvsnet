@@ -97,9 +97,6 @@ for epoch in range(opts.num_epochs):
     with tqdm.tqdm(total=len(data_loader)) if opts.local_rank == 0 else dummy_progress_bar() as progress_bar:
         for itr, data in enumerate(data_loader):
             data = {k:v.float().to(device) for k,v in data.items()}
-            for k,v in data.items():
-                print(k, v.min(), v.max())
-            exit()
             loss_dict, semantics_nv, disp_iv = model_ddp(data, mode='training')
             loss = sum([v for k,v in loss_dict.items()])
             loss.backward()
