@@ -40,7 +40,7 @@ class Alpha2Disp(nn.Module):
         depth_proposals = depth_proposals + z_shift  
         depth_proposals = torch.split(depth_proposals, split_size_or_sections=1, dim=1)
         disp_proposals = [baseline*(k_mat[:, 0, 0]).view(-1, 1, 1, 1, 1)/d.view(batch_size, 1, 1, 1, 1) for d in depth_proposals]
-        disp_map = disp_proposals[-1] * alpha[-1]
+        disp_map = disp_proposals[-1]# * alpha[-1]
         for d in reversed(range(num_d - 1)):
             disp_map = disp_proposals[d] * alpha[d] + (1.0 - alpha[d]) * disp_map
         return disp_map.squeeze(1)
