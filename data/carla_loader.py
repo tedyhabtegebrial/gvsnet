@@ -100,7 +100,7 @@ class Carla(Dataset):
         
     def _get_rel_pose(self, src_file, trg_file):
         cam_src = Path(src_file).parent.parent.stem
-        cam_trg = Path(src_file).parent.parent.stem
+        cam_trg = Path(trg_file).parent.parent.stem
         src_idx, trg_idx = int(cam_src[-2:]), int(cam_trg[-2:])
         if cam_src.startswith('ForwardCameras'):
             x, y = 0, 0

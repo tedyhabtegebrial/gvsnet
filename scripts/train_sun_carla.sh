@@ -8,6 +8,6 @@ python -m torch.distributed.launch --nproc_per_node=1 --nnodes=1 \
             --mode=train \
             --port=6071 \
             --data_path=/data/teddy/carla/ \
-            --logging_path=/data/teddy/temp/gvsnet_expts/carla/sun \
+            --logging_path=/data/teddy/temp/gvsnet_expts/carla_2/sun \
             --image_log_interval=2000 \
 
