@@ -13,6 +13,7 @@ __runs__/
 # C extensions
 *.so
 *.png
+*.pt
 *.gif
 !data/sample_styles/*
 # !docs/assets/carla/*

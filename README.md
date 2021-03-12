@@ -1,10 +1,10 @@
 <h2 align=center> Generative View Synthesis </h2>
 <div align=center>
 This repository contains code accompanying the paper <br>
-<i>Generative View Synthesis: From Single-view Semantics to Novel-view Images.</i> <span> <a href="https://tedyhabtegebrial.github.io/">Tewodros Habtegebrial</a></span> , 
-<span> <a href="https://varunjampani.github.io/">Varun Jampani</a></span> , 
-<span> <a href="http://alumni.soe.ucsc.edu/~orazio/">Orazio Gallo</a></span> , 
-<span> <a href="https://av.dfki.de/members/stricker/">Didier Stricker</a></span>  
+<i>Generative View Synthesis: From Single-view Semantics to Novel-view Images.</i> <span> <a href="https://tedyhabtegebrial.github.io/">Tewodros Habtegebrial</a></span> ,
+<span> <a href="https://varunjampani.github.io/">Varun Jampani</a></span> ,
+<span> <a href="http://alumni.soe.ucsc.edu/~orazio/">Orazio Gallo</a></span> ,
+<span> <a href="https://av.dfki.de/members/stricker/">Didier Stricker</a></span>
 <br> Thirty-fourth Conference on Neural Information Processing Systems (NeurIPS-2020) <br> The project page can be found <a href="https://gvsnet.github.io/">here</a>
 </div>
 
@@ -35,7 +35,7 @@ Download 34 sample scenes (from the CARLA dataset) for demo purpose [link](https
 ###### Run the demo code
 ```
 CUDA_VSIBLE_DEVICES=0 python demo.py \
-    --dataset=carla \
+    --dataset=carla_samples \
     --mode=demo \
     --movement_type=circle \
     --data_path=./datasets/carla_samples \

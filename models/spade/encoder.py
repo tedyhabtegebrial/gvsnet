@@ -9,6 +9,7 @@ import torch.nn.functional as F
 from .base_network import BaseNetwork
 from .normalization import get_nonspade_norm_layer
 
+
 class ConvEncoder(BaseNetwork):
     """ Same architecture as the image discriminator """
 
@@ -20,12 +21,17 @@ class ConvEncoder(BaseNetwork):
         ndf = opts.ngf
         norm_layer = get_nonspade_norm_layer(opts, opts.norm_E)
         self.layer1 = norm_layer(nn.Conv2d(3, ndf, kw, stride=2, padding=pw))
-        self.layer2 = norm_layer(nn.Conv2d(ndf * 1, ndf * 2, kw, stride=2, padding=pw))
-        self.layer3 = norm_layer(nn.Conv2d(ndf * 2, ndf * 4, kw, stride=2, padding=pw))
-        self.layer4 = norm_layer(nn.Conv2d(ndf * 4, ndf * 8, kw, stride=2, padding=pw))
-        self.layer5 = norm_layer(nn.Conv2d(ndf * 8, ndf * 8, kw, stride=2, padding=pw))
+        self.layer2 = norm_layer(
+            nn.Conv2d(ndf * 1, ndf * 2, kw, stride=2, padding=pw))
+        self.layer3 = norm_layer(
+            nn.Conv2d(ndf * 2, ndf * 4, kw, stride=2, padding=pw))
+        self.layer4 = norm_layer(
+            nn.Conv2d(ndf * 4, ndf * 8, kw, stride=2, padding=pw))
+        self.layer5 = norm_layer(
+            nn.Conv2d(ndf * 8, ndf * 8, kw, stride=2, padding=pw))
         if opts.crop_size >= 256:
-            self.layer6 = norm_layer(nn.Conv2d(ndf * 8, ndf * 8, kw, stride=2, padding=pw))
+            self.layer6 = norm_layer(
+                nn.Conv2d(ndf * 8, ndf * 8, kw, stride=2, padding=pw))
 
         self.so = s0 = 4
         self.fc_mu = nn.Linear(ndf * 8 * s0 * s0, 256)

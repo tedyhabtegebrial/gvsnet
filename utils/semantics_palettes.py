@@ -179,6 +179,8 @@ scan_net_pallete = {
 
 
 def get_palette(dataset_name):
+    if dataset_name.startswith('carla_'):
+        dataset_name = 'carla'
     pallet_map = {}
     pallet_map['carla'] = carla_pallete
     pallet_map['vkitti'] = vkitti_pallete
@@ -187,7 +189,10 @@ def get_palette(dataset_name):
     ), f'Unknown dataset {dataset_name}: not in {pallet_map.keys()} '
     return pallet_map[dataset_name]
 
+
 def get_num_classes(dataset_name):
+    if dataset_name.startswith('carla_'):
+        dataset_name = 'carla'
     num_classes_map = {}
     num_classes_map['carla'] = 13
     # num_classes_map['scan_net'] = 13
